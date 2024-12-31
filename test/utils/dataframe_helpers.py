@@ -18,7 +18,7 @@ from lakehouse_engine.core.definitions import (
 from lakehouse_engine.core.exec_env import ExecEnv
 from lakehouse_engine.io.readers.file_reader import FileReader
 from lakehouse_engine.utils.logging_handler import LoggingHandler
-
+from test.utils.exec_env_helpers import ExecEnvHelpers
 
 class DataframeHelpers(object):
     """Class with helper functions to interact with test dataframes."""
@@ -56,25 +56,9 @@ class DataframeHelpers(object):
         )
         return FileReader(input_spec=spec).read()
 
-
 if __name__ == "__main__":
     """Create single execution environment session."""
-    ExecEnv.get_or_create(
-        app_name="Lakehouse Engine Tests",
-        enable_hive_support=False,
-        config={
-            "spark.master": "local[2]",
-            "spark.driver.memory": '2g',
-            "spark.sql.warehouse.dir": "file:///app/tests/lakehouse/spark-warehouse/",  # noqa: E501
-            "spark.sql.shuffle.partitions": "2",
-            "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
-            "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog",  # noqa: E501
-            "spark.jars.packages": "io.delta:delta-spark_2.12:3.2.0,org.xerial:sqlite-jdbc:3.45.3.0,com.databricks:spark-xml_2.12:0.18.0",  # noqa: E501
-            "spark.jars.excludes": "net.sourceforge.f2j:arpack_combined_all",
-            "spark.sql.sources.parallelPartitionDiscovery.parallelism": "2",
-            "spark.sql.legacy.charVarcharAsString": True,
-        },
-    )
+    ExecEnvHelpers.prepare_exec_env('2g')
     # Example usage
     DataframeHelpers._logger.info(
         "Starting the script to read data using DataframeHelpers."
