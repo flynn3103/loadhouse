@@ -44,3 +44,77 @@ class EngineConfig(object):
     engine_dev_usage_path: Optional[str] = None
     collect_engine_usage: str = CollectEngineUsage.ENABLED.value
     dq_functions_column_list: Optional[list] = None
+
+
+class InputFormat(Enum):
+    """Formats of algorithm input."""
+    JDBC = "jdbc"
+    AVRO = "avro"
+    JSON = "json"
+    CSV = "csv"
+    PARQUET = "parquet"
+    DELTAFILES = "delta"
+    CLOUDFILES = "cloudfiles"
+    KAFKA = "kafka"
+    SQL = "sql"
+    SAP_BW = "sap_bw"
+    SAP_B4 = "sap_b4"
+    DATAFRAME = "dataframe"
+    SFTP = "sftp"
+
+    @classmethod
+    def values(cls):  # type: ignore
+        """Generates a list containing all enum values.
+
+        Return:
+            A list with all enum values.
+        """
+        return (c.value for c in cls)
+
+    @classmethod
+    def exists(cls, input_format: str) -> bool:
+        """Checks if the input format exists in the enum values.
+
+        Args:
+            input_format: format to check if exists.
+
+        Return:
+            If the input format exists in our enum.
+        """
+        return input_format in cls.values()
+    
+
+# Formats of input that are considered files.
+FILE_INPUT_FORMATS = [
+    InputFormat.AVRO.value,
+    InputFormat.JSON.value,
+    InputFormat.PARQUET.value,
+    InputFormat.CSV.value,
+    InputFormat.DELTAFILES.value,
+    InputFormat.CLOUDFILES.value,
+]
+
+class ReadType(Enum):
+    """Define the types of read operations.
+
+    - BATCH - read the data in batch mode (e.g., Spark batch).
+    - STREAMING - read the data in streaming mode (e.g., Spark streaming).
+    """
+
+    BATCH = "batch"
+    STREAMING = "streaming"
+
+@dataclass
+class InputSpec(object):
+    """Specification of an algorithm input.
+
+    This is very aligned with the way the execution environment connects to the sources
+    (e.g., spark sources).
+    """
+    spec_id: str
+    read_type: str
+    data_format: Optional[str] = None
+    location: Optional[str] = None
+    schema: Optional[dict] = None
+    options: Optional[dict] = None
+    schema_path: Optional[str] = None

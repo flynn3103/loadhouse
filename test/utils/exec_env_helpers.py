@@ -7,7 +7,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 
 from lakehouse_engine.core.exec_env import ExecEnv
 
-
 class ExecEnvHelpers(object):
     """Class with helper functions to interact with test execution environment."""
 
