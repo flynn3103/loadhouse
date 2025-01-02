@@ -19,7 +19,9 @@ RUN mkdir -p /etc/apt/keyrings && \
     echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list && \
     apt-get -y update && \
     apt-get -y install temurin-8-jdk && \
+    apt-get install -y make && \
     apt-get -y clean
+    
 ENV JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-${CPU_ARCHITECTURE}
 
 # useradd -l is necessary to avoid docker build hanging in export image phase when using large uids

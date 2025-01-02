@@ -5,22 +5,6 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional, Union
 
-class CollectEngineUsage(Enum):
-    """Options for collecting engine usage stats.
-
-    - enabled, enables the collection and storage of Lakehouse Engine
-    usage statistics for any environment.
-    - prod_only, enables the collection and storage of Lakehouse Engine
-    usage statistics for production environment only.
-    - disabled, disables the collection and storage of Lakehouse Engine
-    usage statistics, for all environments.
-    """
-
-    ENABLED = "enabled"
-    PROD_ONLY = "prod_only"
-    DISABLED = "disabled"
-
-
 @dataclass
 class EngineConfig(object):
     """Definitions that can come from the Engine Config file.
@@ -31,20 +15,13 @@ class EngineConfig(object):
         for sending notifications.
     - engine_usage_path: path where the engine prod usage stats are stored.
     - engine_dev_usage_path: path where the engine dev usage stats are stored.
-    - collect_engine_usage: whether to enable the collection of lakehouse
-        engine usage stats or not.
-    - dq_functions_column_list: list of columns to be added to the meta argument
-        of GX when using PRISMA.
     """
-
     dq_bucket: Optional[str] = None
     dq_dev_bucket: Optional[str] = None
     notif_disallowed_email_servers: Optional[list] = None
     engine_usage_path: Optional[str] = None
     engine_dev_usage_path: Optional[str] = None
-    collect_engine_usage: str = CollectEngineUsage.ENABLED.value
     dq_functions_column_list: Optional[list] = None
-
 
 class InputFormat(Enum):
     """Formats of algorithm input."""
@@ -82,8 +59,45 @@ class InputFormat(Enum):
             If the input format exists in our enum.
         """
         return input_format in cls.values()
-    
 
+
+class OutputFormat(Enum):
+    """Formats of algorithm output."""
+    JDBC = "jdbc"
+    AVRO = "avro"
+    JSON = "json"
+    CSV = "csv"
+    PARQUET = "parquet"
+    DELTAFILES = "delta"
+    KAFKA = "kafka"
+    CONSOLE = "console"
+    NOOP = "noop"
+    DATAFRAME = "dataframe"
+    REST_API = "rest_api"
+    FILE = "file"  # Internal use only
+    TABLE = "table"  # Internal use only
+
+    @classmethod
+    def values(cls):  # type: ignore
+        """Generates a list containing all enum values.
+
+        Return:
+            A list with all enum values.
+        """
+        return (c.value for c in cls)
+    
+    @classmethod
+    def exists(cls, output_format: str) -> bool:
+        """Checks if the output format exists in the enum values.
+
+        Args:
+            output_format: format to check if exists.
+
+        Return:
+            If the output format exists in our enum.
+        """
+        return output_format in cls.values()
+    
 # Formats of input that are considered files.
 FILE_INPUT_FORMATS = [
     InputFormat.AVRO.value,
@@ -93,7 +107,14 @@ FILE_INPUT_FORMATS = [
     InputFormat.DELTAFILES.value,
     InputFormat.CLOUDFILES.value,
 ]
-
+# Formats of output that are considered files.
+FILE_OUTPUT_FORMATS = [
+    OutputFormat.AVRO.value,
+    OutputFormat.JSON.value,
+    OutputFormat.PARQUET.value,
+    OutputFormat.CSV.value,
+    OutputFormat.DELTAFILES.value,
+]
 class ReadType(Enum):
     """Define the types of read operations.
 
@@ -118,3 +139,28 @@ class InputSpec(object):
     schema: Optional[dict] = None
     options: Optional[dict] = None
     schema_path: Optional[str] = None
+
+@dataclass
+class OutputSpec(object):
+    """Specification of an algorithm output.
+
+    This is very aligned with the way the execution environment connects to the output
+    systems (e.g., spark outputs).
+
+    - spec_id: id of the output specification.
+    - input_id: id of the corresponding input specification.
+    - write_type: type of write operation.
+    - data_format: format of the output. Defaults to DELTA.
+    - db_table: table name in the form of `<db>.<table>`.
+    - location: uri that identifies from where to write data in the specified format.
+    - partitions: list of partition input_col names.
+    - merge_opts: options to apply to the merge operation.
+    """
+    spec_id: str
+    input_id: str
+    write_type: str
+    data_format: str = OutputFormat.DELTAFILES.value
+    db_table: Optional[str] = None
+    location: Optional[str] = None
+    partitions: Optional[List[str]] = None
+    options: Optional[dict] = None
