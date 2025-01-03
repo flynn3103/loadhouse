@@ -1,7 +1,4 @@
-# lakehouse-auditing-svc
+# Loadhouse tool
 
-
-make build-image
-make terminal
-open remote development extension
+Lakehouse tool with JSON configuration, utilities for ETL task
 

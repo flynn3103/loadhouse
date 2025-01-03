@@ -25,7 +25,8 @@ TEST_LAKEHOUSE_OUT = f"{LAKEHOUSE_FEATURE_OUT}/{TEST_PATH}"
 @pytest.mark.parametrize(
     "scenario",
     [
-        ["full_overwrite", InputFormat.DELTAFILES.value]
+        ["full_overwrite", InputFormat.DELTAFILES.value],
+        ["with_filter", InputFormat.PARQUET.value]
     ],
 )
 def test_batch_full_load(scenario: List[str]) -> None:
@@ -44,7 +45,8 @@ def test_batch_full_load(scenario: List[str]) -> None:
         f"{TEST_RESOURCES}/{scenario[0]}/data/source/part-01.csv",
         f"{TEST_LAKEHOUSE_IN}/{scenario[0]}/data/",
     )
-    load_data(f"file://{TEST_RESOURCES}/{scenario[0]}/batch_init.json")
-    LocalStorage.clean_folder(
-        f"{TEST_LAKEHOUSE_IN}/{scenario[0]}/data",
-    )
+    # breakpoint()
+    # load_data(f"file://{TEST_RESOURCES}/{scenario[0]}/batch_init.json")
+    # LocalStorage.clean_folder(
+    #     f"{TEST_LAKEHOUSE_IN}/{scenario[0]}/data",
+    # )

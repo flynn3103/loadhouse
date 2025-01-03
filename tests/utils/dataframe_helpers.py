@@ -18,7 +18,7 @@ from lakehouse_engine.core.definitions import (
 from lakehouse_engine.core.exec_env import ExecEnv
 from lakehouse_engine.io.readers.file_reader import FileReader
 from lakehouse_engine.utils.logging_handler import LoggingHandler
-from test.utils.exec_env_helpers import ExecEnvHelpers
+from tests.utils.exec_env_helpers import ExecEnvHelpers
 
 class DataframeHelpers(object):
     """Class with helper functions to interact with test dataframes."""

@@ -16,9 +16,6 @@ def load_data(
     Args:
         acon_path: path of the acon (algorithm configuration) file.
         acon: acon provided directly through python code (e.g., notebooks or other apps).
-        collect_engine_usage: Lakehouse usage statistics collection strategy.
-        spark_confs: optional dictionary with the spark confs to be used when collecting
-            the engine usage.
     """
 
     acon = ConfigUtils.get_acon(acon_path, acon)

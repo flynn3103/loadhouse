@@ -164,3 +164,36 @@ class OutputSpec(object):
     location: Optional[str] = None
     partitions: Optional[List[str]] = None
     options: Optional[dict] = None
+
+@dataclass
+class TransformerSpec(object):
+    """Transformer Specification, i.e., a single transformation amongst many.
+
+    - function: name of the function (or callable function) to be executed.
+    - args: (not applicable if using a callable function) dict with the arguments
+        to pass to the function `<k,v>` pairs with the name of the parameter of
+        the function and the respective value.
+    """
+
+    function: str
+    args: dict
+
+@dataclass
+class TransformSpec(object):
+    """Transformation Specification.
+
+    I.e., the specification that defines the many transformations to be done to the data
+    that was read.
+
+    - spec_id: id of the terminate specification
+    - input_id: id of the corresponding input
+    specification.
+    - transformers: list of transformers to execute.
+    - force_streaming_foreach_batch_processing: sometimes, when using streaming, we want
+        to force the transform to be executed in the foreachBatch function to ensure
+        non-supported streaming operations can be properly executed.
+    """
+
+    spec_id: str
+    input_id: str
+    transformers: List[TransformerSpec]

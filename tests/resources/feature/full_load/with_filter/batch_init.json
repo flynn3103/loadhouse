@@ -9,7 +9,7 @@
         "delimiter": "|",
         "inferSchema": true
       },
-      "location": "file:///app/tests/lakehouse/in/feature/full_load/full_overwrite/data"
+      "location": "file:///app/tests/lakehouse/in/feature/full_load/with_filter/data"
     }
   ],
   "output_specs": [
@@ -17,12 +17,8 @@
       "spec_id": "sales_bronze",
       "input_id": "sales_source",
       "write_type": "overwrite",
-      "data_format": "delta",
-      "partitions": [
-        "date",
-        "customer"
-      ],
-      "location": "file:///app/tests/lakehouse/out/feature/full_load/full_overwrite/data"
+      "data_format": "parquet",
+      "location": "file:///app/tests/lakehouse/out/feature/full_load/with_filter/data"
     }
   ]
 }

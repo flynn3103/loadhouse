@@ -7,11 +7,14 @@ from typing import List, Optional
 from lakehouse_engine.algorithms.algorithm import Algorithm
 from lakehouse_engine.utils.logging_handler import LoggingHandler
 from lakehouse_engine.io.reader_factory import ReaderFactory
+from lakehouse_engine.transformers.transformer_factory import TransformerFactory
 from lakehouse_engine.io.writer_factory import WriterFactory
 from lakehouse_engine.core.definitions import (
     InputSpec,
     OutputSpec,
     OutputFormat,
+    TransformerSpec,
+    TransformSpec,
 )
 
 
@@ -39,6 +42,7 @@ class DataLoader(Algorithm):
         self._logger: Logger = LoggingHandler(self.__class__.__name__).get_logger()
         super().__init__(acon)
         self.input_specs: List[InputSpec] = self._get_input_specs()
+        self.transform_specs: List[TransformSpec] = self._get_transform_specs()
         self.output_specs: List[OutputSpec] = self._get_output_specs()
 
     def _get_input_specs(self) -> List[InputSpec]:
@@ -68,6 +72,28 @@ class DataLoader(Algorithm):
             for spec in self.acon["output_specs"]
         ]
 
+    def _get_transform_specs(self) -> List[TransformSpec]:
+        """Get the transformation specifications from an acon.
+        Returns:
+            List of transformation specifications.
+        """
+        transform_specs = []
+        for spec in self.acon.get("transform_specs", []):
+            transform_spec = TransformSpec(
+                spec_id=spec["spec_id"],
+                input_id=spec["input_id"],
+                transformers=[],
+            )
+            for s in spec["transformers"]:
+                transformer_spec = TransformerSpec(
+                    function=s["function"], args=s.get("args", {})
+                )
+                transform_spec.transformers.append(transformer_spec)
+
+                transform_specs.append(transform_spec)
+
+        return transform_specs
+
     def read(self) -> OrderedDict:
         """Read data from an input location into a distributed dataframe.
 
@@ -79,6 +105,29 @@ class DataLoader(Algorithm):
             self._logger.info(f"Found input specification: {spec}")
             read_dfs[spec.spec_id] = ReaderFactory.get_data(spec)
         return read_dfs
+
+    def transform(self, data: OrderedDict) -> OrderedDict:
+        """Transform (optionally) the data that was read.
+        Args:
+            data: input dataframes in an ordered dict.
+
+        Returns:
+            Another ordered dict with the transformed dataframes, according to the
+            transformation specification.
+        """
+        if not self.transform_specs:
+            return data
+        else:
+            transformed_dfs = OrderedDict(data)
+            for spec in self.transform_specs:
+                self._logger.info(f"Found transform specification: {spec}")
+                transformed_df = transformed_dfs[spec.input_id]
+                for transformer in spec.transformers:
+                    transformed_df = transformed_df.transform(
+                        TransformerFactory.get_transformer(transformer, transformed_dfs)
+                    )
+                transformed_dfs[spec.spec_id] = transformed_df
+            return transformed_dfs
 
     def write(self, data: OrderedDict) -> OrderedDict:
         """Write the data that was read and transformed (if applicable).
@@ -107,8 +156,10 @@ class DataLoader(Algorithm):
         try:
             self._logger.info("Starting read stage...")
             read_dfs = self.read()
+            self._logger.info("Starting transform stage...")
+            transformed_dfs = self.transform(read_dfs)
             self._logger.info("Starting write stage...")
-            written_dfs = self.write(read_dfs)
+            written_dfs = self.write(transformed_dfs)
             self._logger.info("Execution of the algorithm has finished!")
         except Exception as e:
             raise e
