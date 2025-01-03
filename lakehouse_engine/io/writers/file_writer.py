@@ -34,7 +34,6 @@ class FileWriter(Writer):
             df: dataframe to write.
             output_spec: output specification.
         """
-        breakpoint()
         df.write.format(output_spec.data_format).partitionBy(
             output_spec.partitions
         ).options(**output_spec.options if output_spec.options else {}).mode(

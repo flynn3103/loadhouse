@@ -14,23 +14,9 @@ from lakehouse_engine.core.definitions import (
     OutputFormat,
 )
 
+
 class DataLoader(Algorithm):
-    """Load data using an algorithm configuration (ACON represented as dict).
-
-    This algorithm focuses on the cases where users will be specifying all the algorithm
-    steps and configurations through a dict based configuration, which we name ACON
-    in our framework.
-
-    Since an ACON is a dict you can pass a custom transformer through a python function
-    and, therefore, the DataLoader can also be used to load data with custom
-    transformations not provided in our transformers package.
-
-    As the algorithm base class of the lakehouse-engine framework is based on the
-    concept of ACON, this DataLoader algorithm simply inherits from Algorithm,
-    without overriding anything. We designed the codebase like this to avoid
-    instantiating the Algorithm class directly, which was always meant to be an
-    abstraction for any specific algorithm included in the lakehouse-engine framework.
-    """
+    """Load data using an algorithm configuration (ACON represented as dict)."""
 
     def __init__(self, acon: dict):
         """Construct DataLoader algorithm instances.
@@ -77,7 +63,7 @@ class DataLoader(Algorithm):
                 data_format=spec.get("data_format", OutputFormat.DELTAFILES.value),
                 db_table=spec.get("db_table", None),
                 location=spec.get("location", None),
-                partitions=spec.get("partitions", [])
+                partitions=spec.get("partitions", []),
             )
             for spec in self.acon["output_specs"]
         ]
@@ -97,14 +83,6 @@ class DataLoader(Algorithm):
     def write(self, data: OrderedDict) -> OrderedDict:
         """Write the data that was read and transformed (if applicable).
 
-        It supports writing multiple datasets. However, we only recommend to write one
-        dataframe. This recommendation is based on easy debugging and reproducibility,
-        since if we start mixing several datasets being fueled by the same algorithm, it
-        would unleash an infinite sea of reproducibility issues plus tight coupling and
-        dependencies between datasets. Having said that, there may be cases where
-        writing multiple datasets is desirable according to the use case requirements.
-        Use it accordingly.
-
         Args:
             data: dataframes that were read and transformed (if applicable).
 
@@ -114,7 +92,6 @@ class DataLoader(Algorithm):
         written_dfs: OrderedDict = OrderedDict({})
         for spec in self.output_specs:
             self._logger.info(f"Found output specification: {spec}")
-
             written_output = WriterFactory.get_writer(
                 spec, data[spec.input_id], data
             ).write()
@@ -130,7 +107,6 @@ class DataLoader(Algorithm):
         try:
             self._logger.info("Starting read stage...")
             read_dfs = self.read()
-            print(read_dfs)
             self._logger.info("Starting write stage...")
             written_dfs = self.write(read_dfs)
             self._logger.info("Execution of the algorithm has finished!")
