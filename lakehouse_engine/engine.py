@@ -3,22 +3,22 @@
 from typing import List, Optional, OrderedDict
 from lakehouse_engine.core.exec_env import ExecEnv
 from lakehouse_engine.utils.configs.config_utils import ConfigUtils
-from lakehouse_engine.utils.acon_utils import validate_and_resolve_acon
-from lakehouse_engine.algorithms.data_loader import DataLoader
+from lakehouse_engine.utils.etl_config_utils import validate_and_resolve_etl_config
+from lakehouse_engine.src.data_loader import DataLoader
 
 
 def load_data(
-    acon_path: Optional[str] = None,
-    acon: Optional[dict] = None,
+    etl_config_path: Optional[str] = None,
+    etl_config: Optional[dict] = None,
 ) -> Optional[OrderedDict]:
-    """Load data using the DataLoader algorithm.
+    """Load data using the DataLoader etl config.
 
     Args:
-        acon_path: path of the acon (algorithm configuration) file.
-        acon: acon provided directly through python code (e.g., notebooks or other apps).
+        etl_config_path: path of the etl_config (etl config configuration) file.
+        etl_config: etl_config provided directly through python code (e.g., notebooks or other apps).
     """
 
-    acon = ConfigUtils.get_acon(acon_path, acon)
-    ExecEnv.get_or_create(app_name="data_loader", config=acon.get("exec_env", None))
-    acon = validate_and_resolve_acon(acon)
-    return DataLoader(acon).execute()
+    etl_config = ConfigUtils.get_etl_config(etl_config_path, etl_config)
+    ExecEnv.get_or_create(app_name="data_loader", config=etl_config.get("exec_env", None))
+    etl_config = validate_and_resolve_etl_config(etl_config)
+    return DataLoader(etl_config).execute()

@@ -24,7 +24,7 @@ class EngineConfig(object):
     dq_functions_column_list: Optional[list] = None
 
 class InputFormat(Enum):
-    """Formats of algorithm input."""
+    """Formats of etl config input."""
     JDBC = "jdbc"
     AVRO = "avro"
     JSON = "json"
@@ -62,7 +62,7 @@ class InputFormat(Enum):
 
 
 class OutputFormat(Enum):
-    """Formats of algorithm output."""
+    """Formats of etl config output."""
     JDBC = "jdbc"
     AVRO = "avro"
     JSON = "json"
@@ -127,7 +127,7 @@ class ReadType(Enum):
 
 @dataclass
 class InputSpec(object):
-    """Specification of an algorithm input.
+    """Specification of an etl config input.
 
     This is very aligned with the way the execution environment connects to the sources
     (e.g., spark sources).
@@ -142,7 +142,7 @@ class InputSpec(object):
 
 @dataclass
 class OutputSpec(object):
-    """Specification of an algorithm output.
+    """Specification of an etl config output.
 
     This is very aligned with the way the execution environment connects to the output
     systems (e.g., spark outputs).
@@ -197,3 +197,75 @@ class TransformSpec(object):
     spec_id: str
     input_id: str
     transformers: List[TransformerSpec]
+
+
+@dataclass
+class DQFunctionSpec(object):
+    """Defines a data quality function specification.
+
+    - function - name of the data quality function (expectation) to execute.
+    It follows the great_expectations api https://greatexpectations.io/expectations/.
+    - args - args of the function (expectation). Follow the same api as above.
+    """
+
+    function: str
+    args: Optional[dict] = None
+
+@dataclass
+class DQSpec(object):
+    """Data quality overall specification.
+    - spec_id - id of the specification.
+    - input_id - id of the input specification.
+    - dq_type - type of DQ process to execute (e.g. validator).
+    - dq_functions - list of function specifications to execute.
+    - data_asset_name - name of the data asset to consider when configuring the great
+        expectations' data source.
+    - expectation_suite_name - name to consider for great expectations' suite.
+    - gx_result_format - great expectations result format. Default: "COMPLETE".
+    - result_sink_format - format of the result table (e.g. delta, parquet, kafka...)
+    - result_sink_location - file system location in which to save the results of the DQ process.
+    - result_sink_partitions - the list of partitions to consider.
+    - fail_on_error - whether to fail the etl config if the validations of your data in
+        the DQ process failed.
+    - source - name of data source, to be easier to identify in analysis. If not
+        specified, it is set as default <input_id>.
+    """
+    spec_id: str
+    input_id: str
+    dq_type: str
+    dq_functions: Optional[List[DQFunctionSpec]] = None
+    data_asset_name: Optional[str] = None
+    expectation_suite_name: Optional[str] = None
+    gx_result_format: Optional[str] = "COMPLETE"
+    result_sink_format: str = OutputFormat.DELTAFILES.value
+    result_sink_location: Optional[str] = None
+    result_sink_partitions: Optional[List[str]] = None
+    fail_on_error: bool = True
+    source: Optional[str] = None
+    result_sink_extra_columns: Optional[List[str]] = None
+    
+
+class DQDefaults(Enum):
+    """Defaults used on the data quality process."""
+    VALIDATION_COLUMN_IDENTIFIER = "validationresultidentifier"
+    DATA_CHECKPOINTS_CLASS_NAME = "SimpleCheckpoint"
+    DATA_CHECKPOINTS_CONFIG_VERSION = 1.0
+    DATASOURCE_EXECUTION_ENGINE = "SparkDFExecutionEngine"
+    DATA_CONNECTORS_MODULE_NAME = "great_expectations.datasource.data_connector"
+    DATA_CONNECTORS_CLASS_NAME = "RuntimeDatetl_confignector"
+    DQ_BATCH_IDENTIFIERS = ["spec_id", "input_id", "timestamp"]
+    DATASOURCE_CLASS_NAME = "Datasource"
+    CUSTOM_EXPECTATION_LIST = [
+        "expect_column_values_to_be_date_not_older_than",
+        "expect_column_pair_a_to_be_smaller_or_equal_than_b",
+        "expect_multicolumn_column_a_must_equal_b_or_c",
+        "expect_queried_column_agg_value_to_be",
+        "expect_column_pair_date_a_to_be_greater_than_or_equal_to_date_b",
+        "expect_column_pair_a_to_be_not_equal_to_b",
+    ]
+
+class WriteType(Enum):
+    """Types of write operations."""
+    OVERWRITE = "overwrite"
+    APPEND = "append"
+    UPDATE = "update"

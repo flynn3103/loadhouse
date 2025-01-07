@@ -50,7 +50,7 @@ class WriterFactory(ABC):
         """
         writer_name = cls._get_writer_name(spec)
         writer = cls.AVAILABLE_WRITERS.get(writer_name)
-
+        
         if writer:
             return writer(output_spec=spec, df=df, data=data) 
         else:

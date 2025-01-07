@@ -13,37 +13,37 @@ class ConfigUtils(object):
 
     _LOGGER = LoggingHandler(__name__).get_logger()
     @classmethod
-    def get_acon(
+    def get_etl_config(
         cls,
-        acon_path: Optional[str] = None,
-        acon: Optional[dict] = None,
+        etl_config_path: Optional[str] = None,
+        etl_config: Optional[dict] = None,
     ) -> dict:
-        """Get acon based on a filesystem path or on a dict.
+        """Get etl_config based on a filesystem path or on a dict.
 
         Args:
-            acon_path: path of the acon (algorithm configuration) file.
-            acon: acon provided directly through python code (e.g., notebooks
+            etl_config_path: path of the etl_config (etl config configuration) file.
+            etl_config: etl_config provided directly through python code (e.g., notebooks
                 or other apps).
             disable_dbfs_retry: optional flag to disable file storage dbfs.
 
         Returns:
-            Dict representation of an acon.
+            Dict representation of an etl_config.
         """
-        acon = (
-            acon if acon else ConfigUtils.read_json_acon(acon_path)
+        etl_config = (
+            etl_config if etl_config else ConfigUtils.read_json_etl_config(etl_config_path)
         )
-        return acon
+        return etl_config
 
     @staticmethod
-    def read_json_acon(path: str) -> Any:
-        """Read an acon (algorithm configuration) file.
+    def read_json_etl_config(path: str) -> Any:
+        """Read an etl_config (etl config configuration) file.
 
         Args:
-            path: path to the acon file.
+            path: path to the etl_config file.
             disable_dbfs_retry: optional flag to disable file storage dbfs.
 
         Returns:
-            The acon file content as a dict.
+            The etl_config file content as a dict.
         """
         return FileStorageFunctions.read_json(path)
     

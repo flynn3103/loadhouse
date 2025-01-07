@@ -20,7 +20,7 @@ class SchemaUtils(object):
         """Get a spark schema from an input specification.
 
         This covers scenarios where the schema is provided as part of the input
-        specification of the algorithm. Schema can come from the table specified in the
+        specification of the etl config. Schema can come from the table specified in the
         input specification (enforce_schema_from_table) or by the dict with the spark
         schema provided there also.
 

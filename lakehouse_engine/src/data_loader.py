@@ -4,10 +4,11 @@ from collections import OrderedDict
 from copy import deepcopy
 from logging import Logger
 from typing import List, Optional
-from lakehouse_engine.algorithms.algorithm import Algorithm
+from lakehouse_engine.core.etl import ETL
 from lakehouse_engine.utils.logging_handler import LoggingHandler
 from lakehouse_engine.io.reader_factory import ReaderFactory
 from lakehouse_engine.transformers.transformer_factory import TransformerFactory
+from lakehouse_engine.dq_processors.dq_factory import DQFactory
 from lakehouse_engine.io.writer_factory import WriterFactory
 from lakehouse_engine.core.definitions import (
     InputSpec,
@@ -15,14 +16,15 @@ from lakehouse_engine.core.definitions import (
     OutputFormat,
     TransformerSpec,
     TransformSpec,
+    DQSpec,
 )
 
 
-class DataLoader(Algorithm):
-    """Load data using an algorithm configuration (ACON represented as dict)."""
+class DataLoader(ETL):
+    """Load data using an ETL configuration (etl_config represented as dict)."""
 
-    def __init__(self, acon: dict):
-        """Construct DataLoader algorithm instances.
+    def __init__(self, etl_config: dict):
+        """Construct DataLoader ETL instances.
 
         A data loader needs several specifications to work properly,
         but some of them might be optional. The available specifications are:
@@ -37,24 +39,25 @@ class DataLoader(Algorithm):
             the target (e.g., optimizing target table, vacuum, compute stats, etc).
 
         Args:
-            acon: algorithm configuration.
+            etl_config: ETL configuration.
         """
         self._logger: Logger = LoggingHandler(self.__class__.__name__).get_logger()
-        super().__init__(acon)
+        super().__init__(etl_config)
         self.input_specs: List[InputSpec] = self._get_input_specs()
         self.transform_specs: List[TransformSpec] = self._get_transform_specs()
         self.output_specs: List[OutputSpec] = self._get_output_specs()
+        self.dq_specs: List[DQSpec] = self._get_dq_specs()
 
     def _get_input_specs(self) -> List[InputSpec]:
-        """Get the input specifications from an acon.
+        """Get the input specifications from an etl_config.
 
         Returns:
             List of input specifications.
         """
-        return [InputSpec(**spec) for spec in self.acon["input_specs"]]
+        return [InputSpec(**spec) for spec in self.etl_config["input_specs"]]
 
     def _get_output_specs(self) -> List[OutputSpec]:
-        """Get the output specifications from an acon.
+        """Get the output specifications from an etl_config.
 
         Returns:
             List of output specifications.
@@ -69,16 +72,16 @@ class DataLoader(Algorithm):
                 location=spec.get("location", None),
                 partitions=spec.get("partitions", []),
             )
-            for spec in self.acon["output_specs"]
+            for spec in self.etl_config["output_specs"]
         ]
 
     def _get_transform_specs(self) -> List[TransformSpec]:
-        """Get the transformation specifications from an acon.
+        """Get the transformation specifications from an etl_config.
         Returns:
             List of transformation specifications.
         """
         transform_specs = []
-        for spec in self.acon.get("transform_specs", []):
+        for spec in self.etl_config.get("transform_specs", []):
             transform_spec = TransformSpec(
                 spec_id=spec["spec_id"],
                 input_id=spec["input_id"],
@@ -93,6 +96,18 @@ class DataLoader(Algorithm):
                 transform_specs.append(transform_spec)
 
         return transform_specs
+
+    def _get_dq_specs(self) -> List[DQSpec]:
+        """Get list of data quality specification objects from etl_config.
+        Returns:
+            List of data quality spec objects.
+        """
+        dq_specs = []
+        for spec in self.etl_config.get("dq_specs", []):
+            dq_spec, dq_functions = ETL.get_dq_spec(spec)
+            dq_spec.dq_functions = dq_functions
+            dq_specs.append(dq_spec)
+        return dq_specs
 
     def read(self) -> OrderedDict:
         """Read data from an input location into a distributed dataframe.
@@ -151,16 +166,35 @@ class DataLoader(Algorithm):
 
         return written_dfs
 
+    def process_dq(self, data: OrderedDict) -> OrderedDict:
+        """Process the data quality tasks for the data that was read and/or transformed.
+        Args:
+            data: dataframes from previous steps of the ETL that we which to
+                run the DQ process on.
+
+        Returns:
+            Another ordered dict with the validated dataframes.
+        """
+        dq_processed_dfs = OrderedDict(data)
+        for spec in self.dq_specs:
+            df_processed_df = dq_processed_dfs[spec.input_id]
+            self._logger.info(f"Found data quality specification: {spec}")
+            dq_processed_dfs[spec.spec_id] = DQFactory.run_dq_process(
+                spec, df_processed_df
+            )
+
     def execute(self) -> Optional[OrderedDict]:
-        """Define the algorithm execution behaviour."""
+        """Define the ETL execution behaviour."""
         try:
             self._logger.info("Starting read stage...")
             read_dfs = self.read()
             self._logger.info("Starting transform stage...")
             transformed_dfs = self.transform(read_dfs)
+            self._logger.info("Starting data quality stage...")
+            validated_dfs = self.process_dq(transformed_dfs)
             self._logger.info("Starting write stage...")
-            written_dfs = self.write(transformed_dfs)
-            self._logger.info("Execution of the algorithm has finished!")
+            written_dfs = self.write(validated_dfs)
+            self._logger.info("Execution of the ETL has finished!")
         except Exception as e:
             raise e
 
