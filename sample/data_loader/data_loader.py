@@ -15,6 +15,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 from lakehouse_engine.engine import load_data
 
 etl_config = {
+    "engine": "spark",
     "input_specs": [
         {
             "spec_id": "sales_source",

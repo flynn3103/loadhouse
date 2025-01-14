@@ -8,7 +8,7 @@ from lakehouse_engine.core.etl import ETL
 from lakehouse_engine.utils.logging_handler import LoggingHandler
 from lakehouse_engine.io.reader_factory import ReaderFactory
 from lakehouse_engine.transformers.transformer_factory import TransformerFactory
-from lakehouse_engine.dq_processors.dq_factory import DQFactory
+from lakehouse_engine.dq_processors.validator import Validator
 from lakehouse_engine.io.writer_factory import WriterFactory
 from lakehouse_engine.core.definitions import (
     InputSpec,
@@ -179,7 +179,7 @@ class DataLoader(ETL):
         for spec in self.dq_specs:
             df_processed_df = dq_processed_dfs[spec.input_id]
             self._logger.info(f"Found data quality specification: {spec}")
-            dq_processed_dfs[spec.spec_id] = DQFactory.run_dq_process(
+            dq_processed_dfs[spec.spec_id] = Validator.run_dq_process(
                 spec, df_processed_df
             )
 

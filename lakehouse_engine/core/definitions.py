@@ -5,24 +5,6 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional, Union
 
-@dataclass
-class EngineConfig(object):
-    """Definitions that can come from the Engine Config file.
-
-    - dq_bucket: S3 prod bucket used to store data quality related artifacts.
-    - dq_dev_bucket: S3 dev bucket used to store data quality related artifacts.
-    - notif_disallowed_email_servers: email servers not allowed to be used
-        for sending notifications.
-    - engine_usage_path: path where the engine prod usage stats are stored.
-    - engine_dev_usage_path: path where the engine dev usage stats are stored.
-    """
-    dq_bucket: Optional[str] = None
-    dq_dev_bucket: Optional[str] = None
-    notif_disallowed_email_servers: Optional[list] = None
-    engine_usage_path: Optional[str] = None
-    engine_dev_usage_path: Optional[str] = None
-    dq_functions_column_list: Optional[list] = None
-
 class InputFormat(Enum):
     """Formats of etl config input."""
     JDBC = "jdbc"
