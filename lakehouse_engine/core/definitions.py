@@ -110,9 +110,6 @@ class ReadType(Enum):
 @dataclass
 class InputSpec(object):
     """Specification of an etl config input.
-
-    This is very aligned with the way the execution environment connects to the sources
-    (e.g., spark sources).
     """
     spec_id: str
     read_type: str
@@ -123,11 +120,35 @@ class InputSpec(object):
     schema_path: Optional[str] = None
 
 @dataclass
+class MergeOptions(object):
+    """Options for a merge operation.
+
+    - merge_predicate: predicate to apply to the merge operation so that we can
+        check if a new record corresponds to a record already included in the
+        historical data.
+    - insert_only: indicates if the merge should only insert data (e.g., deduplicate
+        scenarios).
+    - delete_predicate: predicate to apply to the delete operation.
+    - update_predicate: predicate to apply to the update operation.
+    - insert_predicate: predicate to apply to the insert operation.
+    - update_column_set: rules to apply to the update operation which allows to
+        set the value for each column to be updated.
+        (e.g. {"data": "new.data", "count": "current.count + 1"} )
+    - insert_column_set: rules to apply to the insert operation which allows to
+        set the value for each column to be inserted.
+        (e.g. {"date": "updates.date", "count": "1"} )
+    """
+    merge_predicate: str
+    insert_only: bool = False
+    delete_predicate: Optional[str] = None
+    update_predicate: Optional[str] = None
+    insert_predicate: Optional[str] = None
+    update_column_set: Optional[dict] = None
+    insert_column_set: Optional[dict] = None
+
+@dataclass
 class OutputSpec(object):
     """Specification of an etl config output.
-
-    This is very aligned with the way the execution environment connects to the output
-    systems (e.g., spark outputs).
 
     - spec_id: id of the output specification.
     - input_id: id of the corresponding input specification.
@@ -146,6 +167,8 @@ class OutputSpec(object):
     location: Optional[str] = None
     partitions: Optional[List[str]] = None
     options: Optional[dict] = None
+    merge_opts: Optional[MergeOptions] = None
+
 
 @dataclass
 class TransformerSpec(object):
@@ -164,16 +187,10 @@ class TransformerSpec(object):
 class TransformSpec(object):
     """Transformation Specification.
 
-    I.e., the specification that defines the many transformations to be done to the data
-    that was read.
-
     - spec_id: id of the terminate specification
     - input_id: id of the corresponding input
     specification.
     - transformers: list of transformers to execute.
-    - force_streaming_foreach_batch_processing: sometimes, when using streaming, we want
-        to force the transform to be executed in the foreachBatch function to ensure
-        non-supported streaming operations can be properly executed.
     """
 
     spec_id: str
@@ -224,8 +241,6 @@ class DQSpec(object):
     result_sink_partitions: Optional[List[str]] = None
     fail_on_error: bool = True
     source: Optional[str] = None
-    result_sink_extra_columns: Optional[List[str]] = None
-    
 
 class DQDefaults(Enum):
     """Defaults used on the data quality process."""

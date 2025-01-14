@@ -6,9 +6,11 @@ from pyspark.sql import DataFrame
 
 from lakehouse_engine.core.definitions import FILE_INPUT_FORMATS, InputFormat, InputSpec
 from lakehouse_engine.io.readers.file_reader import FileReader
+from lakehouse_engine.io.readers.query_reader import QueryReader
+from lakehouse_engine.io.readers.jdbc_reader import JDBCReader
+from lakehouse_engine.io.readers.dataframe_reader import DataFrameReader
 
-
-class ReaderFactory(ABC):  # noqa: B024
+class ReaderFactory(ABC):
     """Class for reader factory."""
 
     @classmethod
@@ -23,6 +25,12 @@ class ReaderFactory(ABC):  # noqa: B024
         """
         if spec.data_format in FILE_INPUT_FORMATS:
             read_df = FileReader(input_spec=spec).read()
+        elif spec.data_format == InputFormat.JDBC.value:
+            read_df = JDBCReader(input_spec=spec).read()
+        elif spec.data_format == InputFormat.SQL.value:
+            read_df = QueryReader(input_spec=spec).read()
+        elif spec.data_format == InputFormat.DATAFRAME.value:
+            read_df = DataFrameReader(input_spec=spec).read()
         else:
             raise NotImplementedError(
                 f"The requested input spec format {spec.data_format} is not supported."
