@@ -6,7 +6,6 @@ from lakehouse_engine.utils.configs.config_utils import ConfigUtils
 from lakehouse_engine.utils.etl_config_utils import validate_and_resolve_etl_config
 from lakehouse_engine.src.data_loader import DataLoader
 
-
 def load_data(
     etl_config_path: Optional[str] = None,
     etl_config: Optional[dict] = None,

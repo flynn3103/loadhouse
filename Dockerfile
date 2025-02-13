@@ -1,9 +1,9 @@
-ARG PYTHON_IMAGE
+ARG PYTHON_IMAGE=python:3.11-slim-bullseye
 
-FROM $PYTHON_IMAGE
+FROM ${PYTHON_IMAGE}
 
-ARG USER_ID=1000
-ARG GROUP_ID=1000
+ARG USER_ID=1001
+ARG GROUP_ID=1001
 ARG PYTHON_IMAGE
 ARG CPU_ARCHITECTURE
 
@@ -23,12 +23,18 @@ RUN mkdir -p /etc/apt/keyrings && \
     apt-get -y clean
     
 ENV JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-${CPU_ARCHITECTURE}
+ENV DOCKER_DEFAULT_PLATFORM=linux/${CPU_ARCHITECTURE}
 
 # useradd -l is necessary to avoid docker build hanging in export image phase when using large uids
-RUN groupadd -g ${GROUP_ID} appuser && \
+# First try to use the specified GID, if it fails, let the system assign one
+RUN if ! groupadd -g ${GROUP_ID} appuser 2>/dev/null; then \
+        groupadd appuser; \
+    fi && \
     useradd -rm -l -u ${USER_ID} -d /home/appuser -s /bin/bash -g appuser appuser
 
-COPY cicd/requirements_full.lock /tmp/requirements.txt
+# Copy and install requirements
+COPY requirements.txt /tmp/requirements.txt
+
 
 USER appuser
 
