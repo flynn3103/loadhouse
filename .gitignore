@@ -143,7 +143,7 @@ cython_debug/
 # intellij and vscode
 .idea/
 **.iml
-.vscode/
+
 
 # credentials
 **credential**
