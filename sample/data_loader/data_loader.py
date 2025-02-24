@@ -22,7 +22,7 @@ etl_config = {
             "read_type": "batch",
             "data_format": "csv",
             "options": {"header": True, "delimiter": "|", "inferSchema": True},
-            "location": "file:///app/tests/lakehouse/in/feature/full_load/full_overwrite/data",
+            "location": "sample/lakehouse/input/part-01.csv",
         }
     ],
     "transform_specs": [
@@ -40,7 +40,7 @@ etl_config = {
             "input_id": "sales_source",
             "dq_type": "validator",
             "fail_on_error": True,
-            "result_sink_location": "file:///app/tests/lakehouse/validation",
+            "result_sink_location": "sample/lakehouse/validation",
             "dq_functions": [
                 {
                     "dq_function": "expect_column_values_to_not_be_null",
@@ -56,7 +56,7 @@ etl_config = {
             "write_type": "overwrite",
             "data_format": "delta",
             "partitions": ["date", "customer"],
-            "location": "file:///app/tests/lakehouse/out/feature/full_load/full_overwrite/data",
+            "location": "sample/lakehouse/output",
         }
     ]
 }

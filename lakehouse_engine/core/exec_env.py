@@ -42,7 +42,7 @@ class ExecEnv(object):
         default_config = {
             "spark.master": "local[2]",
             "spark.driver.memory": spark_driver_memory,
-            "spark.sql.warehouse.dir": "file:///app/tests/lakehouse/spark-warehouse/",  
+            "spark.sql.warehouse.dir": "tests/lakehouse/spark-warehouse/",  
             "spark.sql.shuffle.partitions": "2",
             "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
             "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog",  
@@ -53,6 +53,10 @@ class ExecEnv(object):
             "spark.databricks.delta.optimizeWrite.enabled": True,
             "spark.sql.adaptive.enabled": True,
             "spark.databricks.delta.merge.enableLowShuffle": True,
+            "spark.driver.extraJavaOptions": "-Xss4M -Djava.security.manager=allow -Djava.security.policy=spark.policy",
+            "spark.authenticate": "false",
+            "spark.network.crypto.enabled": "false",
+            "spark.ui.enabled": "false",
         }
         cls._LOGGER.info(
             f"Using the following default configs you may want to override them for "

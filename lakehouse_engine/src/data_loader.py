@@ -182,6 +182,7 @@ class DataLoader(ETL):
             dq_processed_dfs[spec.spec_id] = Validator.run_dq_process(
                 spec, df_processed_df
             )
+        return dq_processed_dfs
 
     def execute(self) -> Optional[OrderedDict]:
         """Define the ETL execution behaviour."""

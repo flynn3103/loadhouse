@@ -17,7 +17,7 @@ ifndef spark_driver_memory
 	spark_driver_memory := "2g"
 endif
 
-.PHONY: build-image terminal
+.PHONY: build-image terminal format
 
 # Verify required variables
 verify-variables:
@@ -42,6 +42,16 @@ terminal: build-image
 		$(image_name):$(version) \
 		/bin/bash
 
+# Format Python code using Black
+format:
+	@echo "Checking if Black is installed..."
+	@if ! command -v black >/dev/null 2>&1; then \
+		echo "Installing Black..."; \
+		pip install black; \
+	fi
+	@echo "Formatting Python code with Black..."
+	@black . --exclude "/(.venv|.env|build|dist)/"
+	@echo "Code formatting complete."
 
 # Start PySpark environment for MacOS M1
 pyspark-m1: build-image

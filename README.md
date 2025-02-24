@@ -23,3 +23,7 @@ Loadhouse is a flexible data processing tool that simplifies ETL operations thro
   - Delta Lake
   - File formats (CSV, Parquet, etc.)
   - Console output for debugging
+- **Quality Checker**
+  - Data quality patterns with Apache Airflow
+  - Unit test Spark
+  - Data validation with GX

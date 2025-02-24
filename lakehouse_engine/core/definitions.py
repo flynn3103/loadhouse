@@ -249,7 +249,7 @@ class DQDefaults(Enum):
     DATA_CHECKPOINTS_CONFIG_VERSION = 1.0
     DATASOURCE_EXECUTION_ENGINE = "SparkDFExecutionEngine"
     DATA_CONNECTORS_MODULE_NAME = "great_expectations.datasource.data_connector"
-    DATA_CONNECTORS_CLASS_NAME = "RuntimeDatetl_confignector"
+    DATA_CONNECTORS_CLASS_NAME = "RuntimeDataConnector"
     DQ_BATCH_IDENTIFIERS = ["spec_id", "input_id", "timestamp"]
     DATASOURCE_CLASS_NAME = "Datasource"
     CUSTOM_EXPECTATION_LIST = [

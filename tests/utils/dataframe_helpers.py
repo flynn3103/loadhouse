@@ -63,7 +63,7 @@ if __name__ == "__main__":
     DataframeHelpers._logger.info(
         "Starting the script to read data using DataframeHelpers."
     )
-    location = "/app/test/data/test.csv"  # Replace with the actual file path
+    location = "test/data/test.csv"  # Replace with the actual file path
     try:
         df = DataframeHelpers.read_from_file(location)
         df.show()  # Display the DataFrame content

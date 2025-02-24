@@ -18,7 +18,7 @@ class ExecEnvHelpers(object):
             config={
                 "spark.master": "local[2]",
                 "spark.driver.memory": spark_driver_memory,
-                "spark.sql.warehouse.dir": "file:///app/tests/lakehouse/spark-warehouse/",
+                "spark.sql.warehouse.dir": "tests/lakehouse/spark-warehouse/",
                 "spark.sql.shuffle.partitions": "2",
                 "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
                 "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog",

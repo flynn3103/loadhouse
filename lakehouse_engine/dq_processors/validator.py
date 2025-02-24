@@ -32,10 +32,10 @@ from pyspark.sql.functions import (
 from pyspark.sql.types import StringType
 from great_expectations.data_context.data_context.context_factory import get_context
 from great_expectations.core.batch import RuntimeBatchRequest
-from great_expectations.data_context import EphemeralDatetl_configtext
+from great_expectations.data_context import EphemeralDataContext
 from great_expectations.checkpoint.types.checkpoint_result import CheckpointResult
 from great_expectations.data_context.types.base import (
-    Datetl_configtextConfig,
+    DataContextConfig,
     FilesystemStoreBackendDefaults,
     AnonymizedUsageStatisticsConfig,
 )
@@ -177,7 +177,7 @@ class Validator(object):
     def _configure_and_run_checkpoint(
         cls,
         dq_spec: DQSpec,
-        context: EphemeralDatetl_configtext,
+        context: EphemeralDataContext,
         batch_request: RuntimeBatchRequest,
         expectation_suite_name: str,
     ) -> Tuple[CheckpointResult, DataFrame]:
@@ -188,7 +188,7 @@ class Validator(object):
 
         Args:
             dq_spec: data quality specification.
-            context: the EphemeralDatetl_configtext containing the configurations for the data
+            context: the EphemeralDataContext containing the configurations for the data
                 source and store backend.
             batch_request: run time batch request to be able to query underlying data.
             expectation_suite_name: name of the expectation suite.
