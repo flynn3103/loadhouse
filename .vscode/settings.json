@@ -1,7 +1,7 @@
 {
     "python.analysis.extraPaths": [
         "${workspaceFolder}",
-        "${workspaceFolder}/lakehouse_engine",
+        "${workspaceFolder}/loadhouse",
     ],
     "python.defaultInterpreterPath": "python3",
     "python.analysis.autoImportCompletions": true

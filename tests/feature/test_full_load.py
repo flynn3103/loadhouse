@@ -4,9 +4,9 @@ from typing import List
 
 import pytest
 
-from lakehouse_engine.core.definitions import InputFormat
+from loadhouse.core.definitions import InputFormat
 
-from lakehouse_engine.engine import load_data
+from loadhouse.engine import load_data
 from tests.utils.local_storage import LocalStorage
 from tests.conftest import (
     FEATURE_RESOURCES,

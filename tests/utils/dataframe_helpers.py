@@ -8,16 +8,16 @@ from pyspark.sql.types import StructType
 import sys
 import os
 
-# Add the parent directory of lakehouse_engine to sys.path
+# Add the parent directory of loadhouse to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-from lakehouse_engine.core.definitions import (
+from loadhouse.core.definitions import (
     InputFormat,
     InputSpec,
     ReadType,
 )
-from lakehouse_engine.core.exec_env import ExecEnv
-from lakehouse_engine.io.readers.file_reader import FileReader
-from lakehouse_engine.utils.logging_handler import LoggingHandler
+from loadhouse.core.exec_env import ExecEnv
+from loadhouse.io.readers.file_reader import FileReader
+from loadhouse.utils.logging_handler import LoggingHandler
 from tests.utils.exec_env_helpers import ExecEnvHelpers
 
 class DataframeHelpers(object):

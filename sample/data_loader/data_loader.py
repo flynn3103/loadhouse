@@ -8,11 +8,11 @@ from pyspark.sql.types import StructType
 import sys
 import os
 
-# Add the parent directory of lakehouse_engine to sys.path
+# Add the parent directory of loadhouse to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 # You need to import the Load Data etl config from the Lakehouse Engine, so that you can perform Data Loads.
-from lakehouse_engine.engine import load_data
+from loadhouse.engine import load_data
 
 etl_config = {
     "engine": "spark",

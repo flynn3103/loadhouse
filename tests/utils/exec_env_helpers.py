@@ -4,7 +4,7 @@ import os
 import sys
 
 # Import after sys.path modification
-from lakehouse_engine.core.exec_env import ExecEnv
+from loadhouse.core.exec_env import ExecEnv
 
 class ExecEnvHelpers(object):
     """Class with helper functions to interact with test execution environment."""
