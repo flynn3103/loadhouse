@@ -4,7 +4,6 @@ import os
 
 from pyspark.sql import SparkSession
 from lakehouse_engine.utils.logging_handler import LoggingHandler
-from lakehouse_engine.core.definitions import EngineConfig
 from lakehouse_engine.utils.configs.config_utils import ConfigUtils
 
 class ExecEnv(object):

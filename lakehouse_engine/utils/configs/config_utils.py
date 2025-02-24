@@ -4,7 +4,6 @@ import importlib.resources
 from typing import Any, Optional, Union
 
 import pkg_resources
-import yaml
 from lakehouse_engine.utils.logging_handler import LoggingHandler
 from lakehouse_engine.utils.storage.file_storage_functions import FileStorageFunctions
 
@@ -47,13 +46,3 @@ class ConfigUtils(object):
         """
         return FileStorageFunctions.read_json(path)
     
-    @staticmethod
-    def get_config(package: str = "lakehouse_engine.configs") -> Any:
-        """Get the lakehouse engine configuration file.
-
-        Returns:
-            Configuration dictionary
-        """
-        with importlib.resources.open_binary(package, "engine.yaml") as config:
-            config = yaml.safe_load(config)
-        return config
