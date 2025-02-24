@@ -5,13 +5,14 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="loadhouse",
-    version="0.1.0",
+    version="0.1.3",
     author="Flynn",
     description="A data loading and transformation engine for data lakehouses",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/flynn/loadhouse",
-    packages=find_packages(),
+    packages=find_packages(include=['loadhouse', 'loadhouse.*']),
+    package_data={'loadhouse': ['*', '*/*', '*/*/*', '*/*/*/*']},
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -24,9 +25,9 @@ setup(
     ],
     python_requires=">=3.8",
     install_requires=[
-        "pyspark>=3.2.0",
+        "pyspark>=3.5.0",
         "delta-spark>=3.2.0",
-        "great-expectations>=0.15.0"
+        "great-expectations>=0.18.8"
     ],
     include_package_data=True
 )

@@ -14,7 +14,7 @@ permissions:
 jobs:
   pypi-publish:
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
+    # if: github.event_name == 'release'
     permissions:
       id-token: write
 
